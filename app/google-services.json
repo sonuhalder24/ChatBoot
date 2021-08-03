@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "346210429883",
+    "project_id": "chatboot-98e0e",
+    "storage_bucket": "chatboot-98e0e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346210429883:android:469c0f02781049fd5c329e",
+        "android_client_info": {
+          "package_name": "com.example.chatboot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "346210429883-1re8s34tpjlhb83tvjec5tf3fhkc1ont.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCItZvvr1WXFK7Q2akBKmEq12ZCJB1BqWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "346210429883-1re8s34tpjlhb83tvjec5tf3fhkc1ont.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
