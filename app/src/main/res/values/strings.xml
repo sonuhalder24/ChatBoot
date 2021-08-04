@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ChatBoot</string>
+    <string name="sign_up_txt">Don\'t have account? Sign Up</string>
+    <string name="log_in_txt">Already have an account? Log In</string>
 </resources>
