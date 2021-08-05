@@ -1,24 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/bg_start1"
     tools:context=".MainActivity">
-
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/start_logo"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filledName"
         style="@style/textLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10pt"
+        app:startIconTint="@color/colorPrimary"
+        android:layout_marginTop="3pt"
         android:hint="Name"
+        app:startIconDrawable="@drawable/ic_baseline_person_24"
         app:counterEnabled="true"
+        app:counterTextColor="@color/helperTextCol"
         app:counterMaxLength="50"
-        app:layout_constraintBottom_toTopOf="@+id/filledEmail"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread"
-        tools:layout_editor_absoluteX="23dp">
+        app:helperText="Required*"
+        app:endIconMode="clear_text"
+        app:endIconTint="@color/colorPrimary"
+        app:helperTextTextColor="@color/helperTextCol"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editName"
@@ -26,16 +38,21 @@
             android:layout_height="wrap_content"
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filledEmail"
         style="@style/textLayout"
+        android:layout_marginTop="3pt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10pt"
         android:hint="Email"
-        app:layout_constraintBottom_toTopOf="@+id/filledPassword"
-        app:layout_constraintTop_toBottomOf="@+id/filledName">
+        app:endIconTint="@color/colorPrimary"
+        app:startIconTint="@color/colorPrimary"
+        app:helperText="Required*"
+        app:endIconMode="clear_text"
+        app:helperTextTextColor="@color/helperTextCol"
+        app:startIconDrawable="@drawable/email"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editEmail"
@@ -44,19 +61,21 @@
             android:inputType="textEmailAddress" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filledPassword"
         style="@style/textLayout"
+        android:layout_marginTop="3pt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10pt"
         android:hint="Password"
         app:passwordToggleEnabled="true"
-        app:passwordToggleTint="#881010"
-        app:helperTextTextColor="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toTopOf="@+id/filledConfirmPassword"
-        app:layout_constraintTop_toBottomOf="@+id/filledEmail">
+        app:helperText="Required*"
+        app:passwordToggleTint="@color/colorPrimary"
+        app:startIconDrawable="@drawable/lock"
+        app:startIconTint="@color/colorPrimary"
+        app:helperTextTextColor="@color/helperTextCol"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editPassword"
@@ -65,18 +84,20 @@
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filledConfirmPassword"
         style="@style/textLayout"
+        android:layout_marginTop="3pt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10pt"
         android:hint="Confirm Password"
         app:passwordToggleEnabled="true"
-        app:passwordToggleTint="#881010"
-        app:layout_constraintBottom_toTopOf="@+id/signUpBtn"
-        app:layout_constraintTop_toBottomOf="@+id/filledPassword">
+        app:passwordToggleTint="@color/colorPrimary"
+        app:startIconTint="@color/colorPrimary"
+        app:helperText="Required*"
+        app:startIconDrawable="@drawable/lock"
+        app:helperTextTextColor="@color/helperTextCol">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editConfirmPassword"
@@ -90,43 +111,33 @@
         android:layout_height="wrap_content"
         android:text="Forgot Password"
         android:id="@+id/forgot"
-        app:layout_constraintTop_toBottomOf="@+id/filledConfirmPassword"
         android:gravity="center"
         android:textStyle="bold"
-        android:textColor="#6A5E5E"
+        android:textColor="@color/helperTextCol"
         android:textSize="15dp"
         android:layout_marginVertical="3pt"
-        app:layout_constraintBottom_toTopOf="@+id/signUpBtn"/>
+        />
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/signUpBtn"
+        android:id="@+id/signUp"
         android:background="@drawable/sign_in_button_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10pt"
-        android:layout_marginTop="10pt"
+        android:layout_marginHorizontal="30pt"
+        android:layout_marginTop="3pt"
         android:text="Sign Up"
         android:textAllCaps="false"
         android:textSize="16dp"
         android:textColor="#881010"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/hideTxt"
-        app:layout_constraintTop_toBottomOf="@+id/filledConfirmPassword" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
-
+         />
     <TextView
         android:id="@+id/hideTxt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="5pt"
         android:text="Already have an account? Log In"
-        android:textColor="#881010"
+        android:textColor="@color/helperTextCol"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="@id/guideline1"
-        app:layout_constraintTop_toBottomOf="@+id/signUpBtn" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+         />
+</LinearLayout>
