@@ -106,16 +106,19 @@
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Forgot Password"
         android:id="@+id/forgot"
-        android:gravity="center"
         android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginHorizontal="3dp"
         android:textColor="@color/helperTextCol"
         android:textSize="15dp"
         android:layout_marginVertical="3pt"
+        android:defaultFocusHighlightEnabled="true"
         />
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/signUp"
@@ -136,8 +139,14 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginTop="5pt"
+        android:layout_marginHorizontal="3dp"
         android:text="Already have an account? Log In"
         android:textColor="@color/helperTextCol"
         android:textSize="18sp"
          />
+    <ProgressBar
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:id="@+id/progress"
+        android:visibility="gone"/>
 </LinearLayout>
