@@ -7,12 +7,12 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:background="@drawable/bg_start1"
+    android:background="@drawable/bg_start"
     tools:context=".MainActivity">
     <ImageView
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/start_logo"/>
+        android:src="@drawable/header_logo"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/filledName"
         style="@style/textLayout"
@@ -22,7 +22,7 @@
         app:startIconTint="@color/colorPrimary"
         android:layout_marginTop="3pt"
         android:hint="Name"
-        app:startIconDrawable="@drawable/ic_baseline_person_24"
+        app:startIconDrawable="@drawable/person"
         app:counterEnabled="true"
         app:counterTextColor="@color/helperTextCol"
         app:counterMaxLength="50"
@@ -58,7 +58,8 @@
             android:id="@+id/editEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textEmailAddress" />
+            android:importantForAutofill="noExcludeDescendants"
+            android:inputType="textNoSuggestions"/>
 
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout

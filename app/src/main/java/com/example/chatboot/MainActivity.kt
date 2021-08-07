@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.InputType
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
@@ -15,17 +16,18 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_forgot_pass.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
-
     var count=0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
         auth = FirebaseAuth.getInstance()
+
 
         progress.visibility=View.GONE
         hideTxt.text=getString(R.string.sign_up_txt)
@@ -57,9 +59,13 @@ class MainActivity : AppCompatActivity() {
                 editEmail.setText("")
                 editPassword.setText("")
                 editConfirmPassword.setText("")
-                filledPassword.setHelperText("Required*")
+                filledPassword.setHelperText("Required* (like:user@123)")
             }
         })
+
+        forgot.setOnClickListener {
+            startActivity(Intent(this,ForgotPassActivity::class.java))
+        }
 
         signUp.setOnClickListener({
             if(count==1) {
@@ -92,11 +98,17 @@ class MainActivity : AppCompatActivity() {
                                 auth.createUserWithEmailAndPassword(email, pass)
                                     .addOnCompleteListener(this) { task ->
                                         if (task.isSuccessful) {
-                                            Toast.makeText(this, "You registered successfully", Toast.LENGTH_SHORT).show()
                                             val user = auth.currentUser
-                                            updateUI(user)
+                                            user?.sendEmailVerification()
+                                                ?.addOnCompleteListener{ task->
+                                                    if(task.isSuccessful){
+//                                                        Toast.makeText(this, "You registered successfully", Toast.LENGTH_SHORT).show()
+                                                        updateUI(user)
+                                                    }
+                                                }
+
                                         } else {
-                                            Toast.makeText(this, "Sign up failed", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this,"User Alredy exists",Toast.LENGTH_SHORT).show()
                                             updateUI(null)
                                         }
                                     }
@@ -119,8 +131,8 @@ class MainActivity : AppCompatActivity() {
                         auth.signInWithEmailAndPassword(email,pass)
                             .addOnCompleteListener(this){   task->
                                 if(task.isSuccessful){
-                                    Toast.makeText(this, "Successfully logged in", Toast.LENGTH_SHORT).show()
                                     val user = auth.currentUser
+                                    Toast.makeText(this, "Successfully logged in", Toast.LENGTH_SHORT).show()
                                     updateUI(user)
                                 }
                                 else{
@@ -143,9 +155,26 @@ class MainActivity : AppCompatActivity() {
             progress.visibility=View.GONE
         }
         else{
-            startActivity(Intent(this,ChatActivity::class.java))
-            finish()
+            if(user.isEmailVerified){
+                startActivity(Intent(this,ChatActivity::class.java))
+                finish()
+            }
+            else{
+                Toast.makeText(this, "Please verify your email address", Toast.LENGTH_SHORT).show()
+            }
+
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+            count=0
+            progress.visibility=View.GONE
+            hideTxt.text=getString(R.string.sign_up_txt)
+            signUp.text="Log In"
+            forgot.visibility= View.VISIBLE
+            filledConfirmPassword.visibility=View.GONE
+            filledName.visibility=View.GONE
     }
 }
 

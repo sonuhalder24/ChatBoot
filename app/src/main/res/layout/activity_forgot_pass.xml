@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/bg_start"
+    tools:context=".ForgotPassActivity">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RESET YOUR PASSWORD"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_marginBottom="20pt"
+        android:textSize="20dp"
+        android:fontFamily="serif-monospace"
+        android:textStyle="bold"
+        />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/filledEmail"
+        style="@style/textLayout"
+        android:layout_marginTop="3pt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10pt"
+        android:hint="Email"
+        app:endIconTint="@color/colorPrimary"
+        app:startIconTint="@color/colorPrimary"
+        app:helperText="Required*"
+        app:endIconMode="clear_text"
+        app:helperTextTextColor="@color/helperTextCol"
+        app:startIconDrawable="@drawable/email"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editResetEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:importantForAutofill="noExcludeDescendants"
+            android:inputType="textNoSuggestions"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/resetBtn"
+        android:background="@drawable/sign_in_button_back"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30pt"
+        android:layout_marginTop="10pt"
+        android:text="Reset"
+        android:textAllCaps="false"
+        android:textSize="16dp"
+        android:textColor="#881010"
+        android:textStyle="bold"
+        />
+</LinearLayout>
