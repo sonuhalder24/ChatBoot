@@ -176,6 +176,12 @@ class MainActivity : AppCompatActivity() {
             filledConfirmPassword.visibility=View.GONE
             filledName.visibility=View.GONE
     }
+
+    override fun onBackPressed() {
+        val intent1=Intent(Intent.ACTION_MAIN)
+        intent1.addCategory(Intent.CATEGORY_HOME)
+        startActivity(intent1)
+    }
 }
 
 

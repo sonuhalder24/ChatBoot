@@ -3,6 +3,8 @@ package com.example.chatboot
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
@@ -19,25 +21,25 @@ class ChatActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
+    }
 
-        logOut.setOnClickListener {
-            auth.signOut()
-            startActivity(Intent(this,MainActivity::class.java))
-            finish()
-        }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.profile_menu,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
-        deleteUser.setOnClickListener {
-            user.delete()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Toast.makeText(this,"User account deleted.",Toast.LENGTH_SHORT).show()
-                        startActivity(Intent(this,MainActivity::class.java))
-                       finish()
-                    }
-                    else{
-                        Toast.makeText(this,"Some error occurred",Toast.LENGTH_SHORT).show()
-                    }
-                }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId==R.id.profile){
+            startActivity(Intent(this,Profile::class.java))
         }
+        else if(item.itemId==R.id.groups){
+            startActivity(Intent(this,Group::class.java))
+        }
+        return super.onOptionsItemSelected(item)
+    }
+    override fun onBackPressed() {
+        val intent1=Intent(Intent.ACTION_MAIN)
+        intent1.addCategory(Intent.CATEGORY_HOME)
+        startActivity(intent1)
     }
 }
