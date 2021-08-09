@@ -1,27 +1,22 @@
 package com.example.chatboot
 
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.InputType
-import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
-import androidx.core.content.ContextCompat
+import com.example.chatboot.Models.User
+import com.example.chatboot.daos.UserDao
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
-import kotlinx.android.synthetic.main.activity_forgot_pass.*
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.auth.ktx.userProfileChangeRequest
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     var count=0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -104,6 +99,11 @@ class MainActivity : AppCompatActivity() {
                                                     if(task.isSuccessful){
 //                                                        Toast.makeText(this, "You registered successfully", Toast.LENGTH_SHORT).show()
                                                         updateUI(user)
+                                                        val userFirebase=User(user.uid,editName.text.toString().trim(),user.email,
+                                                            "https://firebasestorage.googleapis.com/v0/b/chatboot-98e0e.appspot.com/o/upload_prof_images%2Fbg_prof_img.jpg?alt=media&token=4b02219e-0a7a-4b74-b96a-fdeb461c4e52"
+                                                            ,"Here using ChatBoot :))")
+                                                        val userDao=UserDao()
+                                                        userDao.addUser(userFirebase)
                                                     }
                                                 }
 
@@ -153,6 +153,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateUI(user: FirebaseUser?) {
         if(user==null){
             progress.visibility=View.GONE
+            return
         }
         else{
             if(user.isEmailVerified){

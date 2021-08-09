@@ -3,11 +3,15 @@ package com.example.chatboot
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.example.chatboot.daos.UserDao
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.activity_profile.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class Profile : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -20,6 +24,9 @@ class Profile : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
+        val db = FirebaseFirestore.getInstance()
+        val userCollection = db.collection("users")
+        val uid= user.uid
 
         logOutTxt.setOnClickListener {
             val mBuilder=AlertDialog.Builder(this)
@@ -41,18 +48,27 @@ class Profile : AppCompatActivity() {
             mBuilder.setTitle("Delete Account Alert")
                 .setMessage("Do you really delete this account?")
                 .setPositiveButton("Yes"){dialogInterface,which->
-                    user.delete()
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                Toast.makeText(this,"User account deleted.",Toast.LENGTH_SHORT).show()
-                                startActivity(Intent(this,MainActivity::class.java))
-                                finish()
+                        userCollection.document(auth.currentUser!!.uid)
+                            .delete()
+                            .addOnSuccessListener {
+//                                Toast.makeText(this,"document deleted",Toast.LENGTH_SHORT).show()
+                                user.delete()
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            Toast.makeText(this,"User Account successfully deleted",Toast.LENGTH_SHORT).show()
+                                            startActivity(Intent(this,MainActivity::class.java))
+                                            finish()
+                                        }
+                                        else{
+                                            Toast.makeText(this,"Some error occurred",Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                             }
-                            else{
+                            .addOnFailureListener{
                                 Toast.makeText(this,"Some error occurred",Toast.LENGTH_SHORT).show()
                             }
-                        }
-                }
+                    }
+
                 .setNegativeButton("No"){dialogInterface,which->
                     dialogInterface.dismiss()
                 }
