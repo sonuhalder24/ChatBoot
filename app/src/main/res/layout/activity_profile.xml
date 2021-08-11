@@ -16,10 +16,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="20dp"
-        app:cardCornerRadius="60dp"
+        app:cardCornerRadius="60dp">
+        <!--
         app:cardBackgroundColor="#DFDFDF"
-        >
+        -->
         <ImageView
+            android:id="@+id/imgHolder"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             />
@@ -73,7 +75,8 @@
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editName"
-            android:text="Dipa Halder"
+            android:text="......"
+            android:maxLines="3"
             android:cursorVisible="false"
             android:background="?attr/selectableItemBackground"
             android:focusableInTouchMode="false"
@@ -116,7 +119,7 @@
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editEmail"
-            android:text="haldersonu36@gmail.com"
+            android:text="...."
             android:cursorVisible="false"
             android:background="?attr/selectableItemBackground"
             android:focusableInTouchMode="false"
@@ -158,7 +161,8 @@
         >
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/editAbout"
-            android:text="Here using ChatBoot :))"
+            android:text="...."
+            android:maxLines="3"
             android:cursorVisible="false"
             android:background="?attr/selectableItemBackground"
             android:focusableInTouchMode="false"

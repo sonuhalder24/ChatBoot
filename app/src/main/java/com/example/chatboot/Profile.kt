@@ -1,29 +1,37 @@
 package com.example.chatboot
 
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
-import android.content.res.Resources
-import androidx.appcompat.app.AppCompatActivity
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
+import android.provider.MediaStore
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior.getTag
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.deishelon.roundedbottomsheet.RoundedBottomSheetDialog
 import com.example.chatboot.daos.UserDao
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_profile.*
-import kotlinx.android.synthetic.main.bottom_sheet_edit_name.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+
 
 class Profile : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    var name=""
+    var mail=""
+    var about=""
+    var img=""
+    private val REQUEST_CODE = 200
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -35,47 +43,144 @@ class Profile : AppCompatActivity() {
         val user = auth.currentUser!!
         val db = FirebaseFirestore.getInstance()
         val userCollection = db.collection("users")
+
+        loadData()
+
         //image upload
         camera_icon_holder.setOnClickListener{
             val mBottomSheetDialog = RoundedBottomSheetDialog(this)
             val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_camera, null)
             mBottomSheetDialog.setContentView(sheetView)
+
+            val removePic=mBottomSheetDialog.findViewById<ImageView>(R.id.remove)
+            val galleryPic=mBottomSheetDialog.findViewById<ImageView>(R.id.gallery)
+            val takePic=mBottomSheetDialog.findViewById<ImageView>(R.id.takeCam)
+
+            removePic?.setOnClickListener {
+                userCollection.document(user.uid).update(
+                    "imageUrl",
+                    "https://firebasestorage.googleapis.com/v0/b/chatboot-98e0e.appspot.com/o/upload_prof_images%2Fbg_prof_img.jpg?alt=media&token=4b02219e-0a7a-4b74-b96a-fdeb461c4e52"
+                )
+                    .addOnSuccessListener {
+                        Glide.with(this)
+                            .load("https://firebasestorage.googleapis.com/v0/b/chatboot-98e0e.appspot.com/o/upload_prof_images%2Fbg_prof_img.jpg?alt=media&token=4b02219e-0a7a-4b74-b96a-fdeb461c4e52")
+                            .into(imgHolder)
+                        Toast.makeText(this, "Profile pic removed", Toast.LENGTH_SHORT).show()
+                        mBottomSheetDialog.dismiss()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
+                    }
+
+            }
+
+            galleryPic?.setOnClickListener {
+                Toast.makeText(this, "Gallery", Toast.LENGTH_SHORT).show()
+                mBottomSheetDialog.dismiss()
+            }
+
+            takePic?.setOnClickListener {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 300)
+                } else {
+                    val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                    startActivityForResult(intent, REQUEST_CODE)
+                    mBottomSheetDialog.dismiss()
+                }
+
+            }
+
             mBottomSheetDialog.show()
         }
+
         //editName
         editName.setOnClickListener {
-            editName.setText("Dipa Halder")
+
             val mBottomSheetDialog = RoundedBottomSheetDialog(this)
             val sheetView = layoutInflater.inflate(R.layout.bottom_sheet_edit_name, null)
             mBottomSheetDialog.setContentView(sheetView)
+
             val btnCancelName = mBottomSheetDialog.findViewById<TextView>(R.id.cancelTxtName)
             val btnSaveName=mBottomSheetDialog.findViewById<TextView>(R.id.saveTxtName)
             val editNameTxt=mBottomSheetDialog.findViewById<EditText>(R.id.editNameTxt)
+            val getDao=UserDao()
+
+            getDao.getUserData(auth.currentUser!!.uid)
+                .addOnCompleteListener{
+                    if(it.isSuccessful){
+                        if (editNameTxt != null) {
+                            editNameTxt.setText(it.result.getString("displayName").toString())
+                        }
+                    }
+                    else{
+                        Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
             if (btnCancelName != null) {
                 btnCancelName.setOnClickListener {
                     mBottomSheetDialog.cancel()
                 }
             }
             if(btnSaveName!=null){
+
                 btnSaveName.setOnClickListener {
                     if (editNameTxt != null) {
-                        editName.setText(editNameTxt.text.toString().trim())
-                        mBottomSheetDialog.cancel()
+                        if(!editNameTxt.text.toString().trim().isEmpty()) {
+                            if(editNameTxt.text.toString().trim().length<=20){
+                                userCollection.document(user.uid).update(
+                                    "displayName",
+                                    editNameTxt.text.toString().trim()
+                                )
+                                    .addOnSuccessListener {
+                                        editName.setText(editNameTxt.text.toString().trim())
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+                                    }
+                                mBottomSheetDialog.cancel()
+                            }
+                            else{
+                                Toast.makeText(
+                                    this,
+                                    "Atmost 20 character are allowed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        else{
+                            Toast.makeText(this, "Empty name not allowed", Toast.LENGTH_SHORT).show()
+                        }
+
+
                     }
                 }
             }
             mBottomSheetDialog.show()
         }
+
         //editAbout
         editAbout.setOnClickListener {
-//            editAbout.setText("Here using ChatBoot :))")
+
             val mBottomSheetDialog=RoundedBottomSheetDialog(this)
-            val sheetView2 = layoutInflater.inflate(R.layout.bottom_sheet_edit_about,null)
+            val sheetView2 = layoutInflater.inflate(R.layout.bottom_sheet_edit_about, null)
             mBottomSheetDialog.setContentView(sheetView2)
             val btnCancelAbout = mBottomSheetDialog.findViewById<TextView>(R.id.cancelTxtAbout)
             val btnSaveAbout=mBottomSheetDialog.findViewById<TextView>(R.id.saveTxtAbout)
             val editAboutTxt=mBottomSheetDialog.findViewById<EditText>(R.id.editAboutTxt)
+            val getDao=UserDao()
 
+            getDao.getUserData(auth.currentUser!!.uid)
+                .addOnCompleteListener{
+                    if(it.isSuccessful){
+                        if (editAboutTxt != null) {
+                            editAboutTxt.setText(it.result.getString("about").toString())
+                        }
+                    }
+                    else{
+                        Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
+                    }
+                }
             if (btnCancelAbout != null) {
                 btnCancelAbout.setOnClickListener {
                     mBottomSheetDialog.cancel()
@@ -84,24 +189,48 @@ class Profile : AppCompatActivity() {
             if(btnSaveAbout!=null){
                 btnSaveAbout.setOnClickListener {
                     if (editAboutTxt != null) {
-                        editAbout.setText(editAboutTxt.text.toString().trim())
-                        mBottomSheetDialog.cancel()
+                        if(!editAboutTxt.text.toString().trim().isEmpty()) {
+                            if(editAboutTxt.text.toString().trim().length<=30){
+                                userCollection.document(user.uid).update(
+                                    "about",
+                                    editAboutTxt.text.toString().trim()
+                                )
+                                    .addOnSuccessListener {
+                                        editAbout.setText(editAboutTxt.text.toString().trim())
+                                    }
+                                    .addOnFailureListener {
+                                        Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+                                    }
+                                mBottomSheetDialog.cancel()
+                            }
+                            else{
+                                Toast.makeText(
+                                    this,
+                                    "Atmost 30 character are allowed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                        else{
+                            Toast.makeText(this, "Empty name not allowed", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
             mBottomSheetDialog.show()
         }
+
         //logOut user
         logOutTxt.setOnClickListener {
             val mBuilder=AlertDialog.Builder(this)
             mBuilder.setTitle("Log Out Alert")
                     .setMessage("Do you really log out from this account?")
-                    .setPositiveButton("Yes"){dialogInterface,which->
+                    .setPositiveButton("Yes"){ dialogInterface, which->
                         auth.signOut()
-                        startActivity(Intent(this,MainActivity::class.java))
+                        startActivity(Intent(this, MainActivity::class.java))
                         finish()
             }
-                    .setNegativeButton("No"){dialogInterface,which->
+                    .setNegativeButton("No"){ dialogInterface, which->
                 dialogInterface.dismiss()
             }
             val alertDialog:AlertDialog=mBuilder.create()
@@ -113,29 +242,37 @@ class Profile : AppCompatActivity() {
             val mBuilder=AlertDialog.Builder(this)
             mBuilder.setTitle("Delete Account Alert")
                 .setMessage("Do you really delete this account?")
-                .setPositiveButton("Yes"){dialogInterface,which->
+                .setPositiveButton("Yes"){ dialogInterface, which->
                         userCollection.document(auth.currentUser!!.uid)
                             .delete()
                             .addOnSuccessListener {
-//                                Toast.makeText(this,"document deleted",Toast.LENGTH_SHORT).show()
+
                                 user.delete()
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            Toast.makeText(this,"User Account successfully deleted",Toast.LENGTH_SHORT).show()
-                                            startActivity(Intent(this,MainActivity::class.java))
+                                            Toast.makeText(
+                                                this,
+                                                "User Account successfully deleted",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            startActivity(Intent(this, MainActivity::class.java))
                                             finish()
                                         }
                                         else{
-                                            Toast.makeText(this,"Some error occurred",Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                this,
+                                                "Some error occurred",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                             }
                             .addOnFailureListener{
-                                Toast.makeText(this,"Some error occurred",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Some error occurred", Toast.LENGTH_SHORT).show()
                             }
                     }
 
-                .setNegativeButton("No"){dialogInterface,which->
+                .setNegativeButton("No"){ dialogInterface, which->
                     dialogInterface.dismiss()
                 }
             val alertDialog:AlertDialog=mBuilder.create()
@@ -143,10 +280,66 @@ class Profile : AppCompatActivity() {
         }
     }
 
+    private fun loadData() {
+        val getDao=UserDao()
+        getDao.getUserData(auth.currentUser!!.uid)
+            .addOnCompleteListener{
+                if(it.isSuccessful){
+                    name=it.result.getString("displayName").toString()
+                    mail=it.result.getString("email").toString()
+                    about=it.result.getString("about").toString()
+                    img=it.result.getString("imageUrl").toString()
+                    editName.setText(name)
+                    editEmail.setText(mail)
+                    editAbout.setText(about)
+                    Glide.with(this).load(img).into(imgHolder)
+                }
+                else{
+                    Toast.makeText(this, "No loaded", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        val db = FirebaseFirestore.getInstance()
+        val userCollection = db.collection("users")
+        val uID=FirebaseAuth.getInstance().currentUser!!.uid
+
+
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE && data != null){
+            val capImg=data.extras?.get("data") as Bitmap
+            imgHolder.setImageBitmap(capImg)
+            val byteArrayOutputStream=ByteArrayOutputStream()
+            capImg.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+            val dat = byteArrayOutputStream.toByteArray()
+
+            val storage =FirebaseStorage.getInstance().getReference("images").child(uID)
+            storage.putBytes(dat)
+                .addOnSuccessListener {
+                    storage.downloadUrl.addOnSuccessListener {
+                        val link=it.toString()
+//                        Toast.makeText(this, it.toString(), Toast.LENGTH_SHORT).show()
+                        userCollection.document(uID).update("imageUrl",link)
+                            .addOnSuccessListener {
+                                Glide.with(this).load(link).into(imgHolder)
+                                Toast.makeText(this, "Image Upload Successfully", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+                            }
+                    }
+
+                }
+                .addOnFailureListener{
+                    Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
+                }
+
+        }
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
     }
-
 }
