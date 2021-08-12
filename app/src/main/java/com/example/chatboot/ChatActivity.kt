@@ -21,6 +21,10 @@ class ChatActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
+        if(user==null){
+            startActivity(Intent(this,MainActivity::class.java))
+            finish()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

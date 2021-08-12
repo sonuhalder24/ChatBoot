@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.EditText
@@ -31,7 +33,8 @@ class Profile : AppCompatActivity() {
     var mail=""
     var about=""
     var img=""
-    private val REQUEST_CODE = 200
+    private val REQUEST_CODE_GALLERY = 200
+    private val REQUEST_CODE_TAKE_PIC = 300
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -76,15 +79,23 @@ class Profile : AppCompatActivity() {
 
             galleryPic?.setOnClickListener {
                 Toast.makeText(this, "Gallery", Toast.LENGTH_SHORT).show()
+                val intent1 = Intent()
+                intent1.action = Intent.ACTION_GET_CONTENT
+                intent1.type = "image/*"
+                startActivityForResult(intent1, 200)
                 mBottomSheetDialog.dismiss()
             }
 
             takePic?.setOnClickListener {
                 if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)!= PackageManager.PERMISSION_GRANTED){
-                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 300)
+                    ActivityCompat.requestPermissions(
+                        this,
+                        arrayOf(Manifest.permission.CAMERA),
+                        REQUEST_CODE_GALLERY
+                    )
                 } else {
                     val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(intent, REQUEST_CODE)
+                    startActivityForResult(intent, REQUEST_CODE_TAKE_PIC)
                     mBottomSheetDialog.dismiss()
                 }
 
@@ -134,6 +145,7 @@ class Profile : AppCompatActivity() {
                                 )
                                     .addOnSuccessListener {
                                         editName.setText(editNameTxt.text.toString().trim())
+                                        Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show()
                                     }
                                     .addOnFailureListener {
                                         Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
@@ -175,6 +187,7 @@ class Profile : AppCompatActivity() {
                     if(it.isSuccessful){
                         if (editAboutTxt != null) {
                             editAboutTxt.setText(it.result.getString("about").toString())
+
                         }
                     }
                     else{
@@ -197,6 +210,7 @@ class Profile : AppCompatActivity() {
                                 )
                                     .addOnSuccessListener {
                                         editAbout.setText(editAboutTxt.text.toString().trim())
+                                        Toast.makeText(this, "About updated", Toast.LENGTH_SHORT).show()
                                     }
                                     .addOnFailureListener {
                                         Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
@@ -252,7 +266,7 @@ class Profile : AppCompatActivity() {
                                         if (task.isSuccessful) {
                                             Toast.makeText(
                                                 this,
-                                                "User Account successfully deleted",
+                                                "User Account successfully deleted and uninstall from everywhere you login",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                             startActivity(Intent(this, MainActivity::class.java))
@@ -280,6 +294,7 @@ class Profile : AppCompatActivity() {
         }
     }
 
+    //getting data from firestore
     private fun loadData() {
         val getDao=UserDao()
         getDao.getUserData(auth.currentUser!!.uid)
@@ -307,7 +322,7 @@ class Profile : AppCompatActivity() {
         val uID=FirebaseAuth.getInstance().currentUser!!.uid
 
 
-        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE && data != null){
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_TAKE_PIC && data != null){
             val capImg=data.extras?.get("data") as Bitmap
             imgHolder.setImageBitmap(capImg)
             val byteArrayOutputStream=ByteArrayOutputStream()
@@ -319,11 +334,14 @@ class Profile : AppCompatActivity() {
                 .addOnSuccessListener {
                     storage.downloadUrl.addOnSuccessListener {
                         val link=it.toString()
-//                        Toast.makeText(this, it.toString(), Toast.LENGTH_SHORT).show()
-                        userCollection.document(uID).update("imageUrl",link)
+                        userCollection.document(uID).update("imageUrl", link)
                             .addOnSuccessListener {
                                 Glide.with(this).load(link).into(imgHolder)
-                                Toast.makeText(this, "Image Upload Successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    this,
+                                    "Image Upload Successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                             .addOnFailureListener {
                                 Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
@@ -335,6 +353,48 @@ class Profile : AppCompatActivity() {
                     Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
                 }
 
+        }
+        else if(resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_GALLERY && data != null){
+            val imageUri = data.data
+            imgHolder.setImageURI(imageUri)
+            uploadimage(imageUri)
+        }
+    }
+
+    //upload image using gallery method
+    private fun uploadimage(imageUri: Uri?) {
+        val db = FirebaseFirestore.getInstance()
+        val userCollection = db.collection("users")
+        val uID=FirebaseAuth.getInstance().currentUser!!.uid
+
+
+        val storage=FirebaseStorage.getInstance().getReference("images").child(uID)
+        if (imageUri != null) {
+            storage.putFile(imageUri)
+                .addOnSuccessListener {
+                    storage.downloadUrl
+                        .addOnSuccessListener{
+                            val link=it.toString()
+                            userCollection.document(uID).update("imageUrl", link)
+                                .addOnSuccessListener {
+                                    Glide.with(this).load(link).into(imgHolder)
+                                    Toast.makeText(
+                                        this,
+                                        "Image Upload Successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+                                }
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show()
+                        }
+                }
+                .addOnFailureListener{
+                    Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 

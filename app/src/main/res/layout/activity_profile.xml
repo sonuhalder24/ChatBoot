@@ -17,9 +17,6 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="20dp"
         app:cardCornerRadius="60dp">
-        <!--
-        app:cardBackgroundColor="#DFDFDF"
-        -->
         <ImageView
             android:id="@+id/imgHolder"
             android:layout_width="match_parent"
