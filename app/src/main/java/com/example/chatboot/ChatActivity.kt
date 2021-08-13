@@ -6,12 +6,15 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.android.synthetic.main.activity_profile.*
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -21,10 +24,7 @@ class ChatActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
-        if(user==null){
-            startActivity(Intent(this,MainActivity::class.java))
-            finish()
-        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

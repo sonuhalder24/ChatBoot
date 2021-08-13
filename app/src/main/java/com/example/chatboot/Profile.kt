@@ -65,7 +65,7 @@ class Profile : AppCompatActivity() {
                     "https://firebasestorage.googleapis.com/v0/b/chatboot-98e0e.appspot.com/o/upload_prof_images%2Fbg_prof_img.jpg?alt=media&token=4b02219e-0a7a-4b74-b96a-fdeb461c4e52"
                 )
                     .addOnSuccessListener {
-                        Glide.with(this)
+                        Glide.with(getApplicationContext())
                             .load("https://firebasestorage.googleapis.com/v0/b/chatboot-98e0e.appspot.com/o/upload_prof_images%2Fbg_prof_img.jpg?alt=media&token=4b02219e-0a7a-4b74-b96a-fdeb461c4e52")
                             .into(imgHolder)
                         Toast.makeText(this, "Profile pic removed", Toast.LENGTH_SHORT).show()
@@ -78,7 +78,6 @@ class Profile : AppCompatActivity() {
             }
 
             galleryPic?.setOnClickListener {
-                Toast.makeText(this, "Gallery", Toast.LENGTH_SHORT).show()
                 val intent1 = Intent()
                 intent1.action = Intent.ACTION_GET_CONTENT
                 intent1.type = "image/*"
@@ -114,20 +113,10 @@ class Profile : AppCompatActivity() {
             val btnCancelName = mBottomSheetDialog.findViewById<TextView>(R.id.cancelTxtName)
             val btnSaveName=mBottomSheetDialog.findViewById<TextView>(R.id.saveTxtName)
             val editNameTxt=mBottomSheetDialog.findViewById<EditText>(R.id.editNameTxt)
-            val getDao=UserDao()
 
-            getDao.getUserData(auth.currentUser!!.uid)
-                .addOnCompleteListener{
-                    if(it.isSuccessful){
-                        if (editNameTxt != null) {
-                            editNameTxt.setText(it.result.getString("displayName").toString())
-                        }
-                    }
-                    else{
-                        Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
-                    }
-                }
-
+            if (editNameTxt != null) {
+                editNameTxt.setText(name)
+            }
             if (btnCancelName != null) {
                 btnCancelName.setOnClickListener {
                     mBottomSheetDialog.cancel()
@@ -180,20 +169,11 @@ class Profile : AppCompatActivity() {
             val btnCancelAbout = mBottomSheetDialog.findViewById<TextView>(R.id.cancelTxtAbout)
             val btnSaveAbout=mBottomSheetDialog.findViewById<TextView>(R.id.saveTxtAbout)
             val editAboutTxt=mBottomSheetDialog.findViewById<EditText>(R.id.editAboutTxt)
-            val getDao=UserDao()
 
-            getDao.getUserData(auth.currentUser!!.uid)
-                .addOnCompleteListener{
-                    if(it.isSuccessful){
-                        if (editAboutTxt != null) {
-                            editAboutTxt.setText(it.result.getString("about").toString())
+            if (editAboutTxt != null) {
+                editAboutTxt.setText(about)
 
-                        }
-                    }
-                    else{
-                        Toast.makeText(this, "Something wrong", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            }
             if (btnCancelAbout != null) {
                 btnCancelAbout.setOnClickListener {
                     mBottomSheetDialog.cancel()
@@ -266,7 +246,7 @@ class Profile : AppCompatActivity() {
                                         if (task.isSuccessful) {
                                             Toast.makeText(
                                                 this,
-                                                "User Account successfully deleted and uninstall from everywhere you login",
+                                                "User Account successfully deleted",
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                             startActivity(Intent(this, MainActivity::class.java))
@@ -296,23 +276,33 @@ class Profile : AppCompatActivity() {
 
     //getting data from firestore
     private fun loadData() {
-        val getDao=UserDao()
-        getDao.getUserData(auth.currentUser!!.uid)
-            .addOnCompleteListener{
-                if(it.isSuccessful){
-                    name=it.result.getString("displayName").toString()
-                    mail=it.result.getString("email").toString()
-                    about=it.result.getString("about").toString()
-                    img=it.result.getString("imageUrl").toString()
-                    editName.setText(name)
-                    editEmail.setText(mail)
-                    editAbout.setText(about)
-                    Glide.with(this).load(img).into(imgHolder)
-                }
-                else{
-                    Toast.makeText(this, "No loaded", Toast.LENGTH_SHORT).show()
-                }
-            }
+        auth= FirebaseAuth.getInstance()
+        val user = auth.currentUser!!
+        val db = FirebaseFirestore.getInstance()
+        val userCollection = db.collection("users")
+        userCollection.document(user.uid)
+                        .addSnapshotListener { value, error ->
+                            if (error != null) {
+                                Toast.makeText(this, "Listen failed", Toast.LENGTH_SHORT).show()
+                                return@addSnapshotListener
+                            }
+
+                            if (value != null && value.exists()) {
+
+                                name=value.getString("displayName").toString()
+                                mail=value.getString("email").toString()
+                                about=value.getString("about").toString()
+                                img=value.getString("imageUrl").toString()
+                                editName.setText(name)
+                                editEmail.setText(mail)
+                                editAbout.setText(about)
+                                Glide.with(getApplicationContext()).load(img).into(imgHolder)
+
+                            } else {
+                                Toast.makeText(this, "Please uninstall and reinstall your app", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
