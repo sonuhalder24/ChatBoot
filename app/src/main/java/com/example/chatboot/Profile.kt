@@ -25,8 +25,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.android.synthetic.main.activity_profile.*
 import java.io.ByteArrayOutputStream
-
-
 class Profile : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     var name=""
