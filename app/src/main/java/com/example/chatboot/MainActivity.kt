@@ -3,6 +3,7 @@ package com.example.chatboot
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.View
 import android.widget.Toast
 import com.example.chatboot.Models.User
@@ -22,8 +23,8 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.AppTheme)
         supportActionBar?.hide()
         setContentView(R.layout.activity_main)
-        auth = FirebaseAuth.getInstance()
 
+        auth = FirebaseAuth.getInstance()
 
         progress.visibility=View.GONE
         hideTxt.text=getString(R.string.sign_up_txt)
