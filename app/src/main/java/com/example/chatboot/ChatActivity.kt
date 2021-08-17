@@ -1,20 +1,24 @@
 package com.example.chatboot
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.bumptech.glide.Glide
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.EmailAuthProvider
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentPagerAdapter
+import androidx.viewpager.widget.ViewPager
+
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
+
+
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.example.chatboot.Adapters.FragmentsAdapter
+import com.example.chatboot.ui.chats
+import com.example.chatboot.ui.status
 import kotlinx.android.synthetic.main.activity_chat.*
-import kotlinx.android.synthetic.main.activity_profile.*
+
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -22,28 +26,56 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
+
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
 
+        if(viewpager!=null){
+            setUpViewPager(viewpager)
+        }
+        tabs.setupWithViewPager(viewpager)
+
+        val menuItemProfile:MenuItem=toolbar.menu.findItem(R.id.profile)
+        val menuItemGroup:MenuItem=toolbar.menu.findItem(R.id.groups)
+
+        menuItemProfile.setOnMenuItemClickListener {
+            startActivity(Intent(this, Profile::class.java))
+            return@setOnMenuItemClickListener true
+        }
+        menuItemGroup.setOnMenuItemClickListener {
+            startActivity(Intent(this, Group::class.java))
+            return@setOnMenuItemClickListener true
+        }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.profile_menu,menu)
-        return super.onCreateOptionsMenu(menu)
+    private fun setUpViewPager(viewpager: ViewPager) {
+        val adapter = FragmentsAdapter(supportFragmentManager)
+        adapter.addFragment(chats(), "Chats")
+        adapter.addFragment(status(), "Status")
+        viewpager.setAdapter(adapter)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId==R.id.profile){
-            startActivity(Intent(this,Profile::class.java))
-        }
-        else if(item.itemId==R.id.groups){
-            startActivity(Intent(this,Group::class.java))
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.profile_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
+//
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if(item.itemId==R.id.profile){
+//            startActivity(Intent(this, Profile::class.java))
+//        }
+//        else if(item.itemId==R.id.groups){
+//            startActivity(Intent(this, Group::class.java))
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
     override fun onBackPressed() {
         val intent1=Intent(Intent.ACTION_MAIN)
         intent1.addCategory(Intent.CATEGORY_HOME)
         startActivity(intent1)
     }
+
+
 }
