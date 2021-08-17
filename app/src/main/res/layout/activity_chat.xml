@@ -15,10 +15,12 @@
         android:layout_height="wrap_content"
         style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
         >
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
+            app:title="ChatBoot"
             app:menu="@menu/profile_menu"
-            style="@style/Widget.MaterialComponents.TabLayout.PrimarySurface"
+            android:elevation="0dp"
+            style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@android:color/transparent"
@@ -30,7 +32,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            app:tabTextColor="@android:color/white"
+            app:tabTextColor="#B5D1BABA"
+
             app:tabSelectedTextColor="@android:color/white"
             app:tabIndicatorColor="@android:color/white"/>
 
