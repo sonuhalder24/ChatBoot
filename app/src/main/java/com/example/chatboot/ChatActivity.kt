@@ -15,19 +15,16 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.example.chatboot.Adapters.FragmentsAdapter
+import com.example.chatboot.Models.Friends
 import com.example.chatboot.ui.chats
 import com.example.chatboot.ui.status
 import kotlinx.android.synthetic.main.activity_chat.*
-
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
-
-//        setSupportActionBar(toolbar)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(false)
 
         auth = FirebaseAuth.getInstance()
         val user = auth.currentUser!!
@@ -57,20 +54,7 @@ class ChatActivity : AppCompatActivity() {
         viewpager.setAdapter(adapter)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.profile_menu, menu)
-//        return super.onCreateOptionsMenu(menu)
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if(item.itemId==R.id.profile){
-//            startActivity(Intent(this, Profile::class.java))
-//        }
-//        else if(item.itemId==R.id.groups){
-//            startActivity(Intent(this, Group::class.java))
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
+
     override fun onBackPressed() {
         val intent1=Intent(Intent.ACTION_MAIN)
         intent1.addCategory(Intent.CATEGORY_HOME)

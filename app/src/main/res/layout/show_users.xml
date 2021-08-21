@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingHorizontal="5pt"
     android:paddingTop="4pt"
@@ -11,6 +11,8 @@
         android:id="@+id/imgContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="2pt"
+        android:layout_marginStart="2pt"
         app:cardCornerRadius="30dp"
         app:cardBackgroundColor="@color/colorAccent"
         android:layout_width="55dp"
@@ -45,10 +47,12 @@
         app:layout_constraintBottom_toBottomOf="@id/imgContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>
-    <view
+    <View
+        android:id="@+id/vHr"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:backgroundTint="#7E6F6F"
+        android:background="#DCCBCB"
         app:layout_constraintTop_toBottomOf="@id/userChat"
-        android:layout_marginTop="4pt"/>
+        android:layout_marginTop="8pt"
+       />
 </androidx.constraintlayout.widget.ConstraintLayout>
